@@ -222,29 +222,538 @@ const MarketingAutomationPlatform = () => {
     </div>
   );
 
-  const renderSalesProcess = () => (
-    <div className="space-y-6">
-      <InfoBox>Understanding your sales process helps identify automation opportunities.</InfoBox>
-      <textarea rows={6} placeholder="Describe your sales process..." className="w-full p-4 border-2 rounded-lg" value={responses.salesSteps || ''} onChange={(e) => updateResponse('salesSteps', e.target.value)} />
-    </div>
-  );
+  const renderSalesProcess = () => {
+  const businessType = responses.businessType;
+  
+  // Business-type specific sales process questions
+  const salesProcessConfig = {
+    ecommerce: {
+      leadSources: ['Social media ads', 'Google Shopping', 'Marketplace (Amazon/Etsy)', 'Instagram/TikTok', 'Email marketing', 'Influencer partnerships', 'SEO/Organic', 'Affiliate marketing'],
+      keyMetrics: ['Cart abandonment rate', 'Average order value', 'Customer lifetime value', 'Return rate', 'Conversion rate by traffic source'],
+      specificQuestion: {
+        label: 'What\'s your biggest e-commerce challenge?',
+        options: ['High cart abandonment', 'Low conversion rate', 'Customer retention', 'Product returns', 'Scaling ad spend', 'Inventory management']
+      }
+    },
+    service: {
+      leadSources: ['Referrals', 'Google Search/Maps', 'Local advertising', 'Website', 'Social media', 'Networking events', 'Partnerships', 'Yelp/Reviews'],
+      keyMetrics: ['Booking rate', 'No-show rate', 'Average service value', 'Repeat customer rate', 'Lead response time'],
+      specificQuestion: {
+        label: 'What\'s your biggest service business challenge?',
+        options: ['Scheduling conflicts', 'Last-minute cancellations', 'Inconsistent lead flow', 'Pricing objections', 'Competition', 'Service capacity']
+      }
+    },
+    software: {
+      leadSources: ['Product Hunt', 'Content marketing', 'Free trial signups', 'SaaS directories', 'LinkedIn', 'Paid ads', 'App stores', 'Partner integrations'],
+      keyMetrics: ['Free trial to paid conversion', 'Monthly recurring revenue (MRR)', 'Churn rate', 'Customer acquisition cost', 'Time to value'],
+      specificQuestion: {
+        label: 'What\'s your biggest SaaS challenge?',
+        options: ['Trial users not converting', 'High churn rate', 'Low product adoption', 'Long sales cycles', 'Feature requests overload', 'Pricing strategy']
+      }
+    },
+    consulting: {
+      leadSources: ['Referrals', 'Speaking engagements', 'LinkedIn outreach', 'Thought leadership content', 'Past clients', 'Industry events', 'Cold outreach', 'Partnerships'],
+      keyMetrics: ['Proposal acceptance rate', 'Average project value', 'Pipeline value', 'Client retention', 'Referral rate'],
+      specificQuestion: {
+        label: 'What\'s your biggest consulting challenge?',
+        options: ['Inconsistent pipeline', 'Long sales cycles', 'Scope creep', 'Pricing/positioning', 'Finding decision makers', 'Competing on price']
+      }
+    },
+    coaching: {
+      leadSources: ['Social media content', 'Webinars', 'Discovery calls', 'Podcast appearances', 'YouTube', 'Referrals', 'Speaking events', 'Book/Course'],
+      keyMetrics: ['Discovery call to client conversion', 'Program completion rate', 'Client results/testimonials', 'Referral rate', 'Average client value'],
+      specificQuestion: {
+        label: 'What\'s your biggest coaching challenge?',
+        options: ['Finding qualified leads', 'Pricing resistance', 'Client commitment/completion', 'Standing out from competition', 'Scaling beyond 1-on-1', 'Building authority']
+      }
+    },
+    agency: {
+      leadSources: ['Referrals', 'Case studies/Portfolio', 'Cold outreach', 'Partnerships', 'Content marketing', 'LinkedIn', 'Industry events', 'Retainer renewals'],
+      keyMetrics: ['Client acquisition cost', 'Average retainer value', 'Client lifetime value', 'Proposal win rate', 'Client retention rate'],
+      specificQuestion: {
+        label: 'What\'s your biggest agency challenge?',
+        options: ['Inconsistent lead flow', 'Scope creep', 'Client churn', 'Pricing/profitability', 'Team capacity', 'Differentiating from competitors']
+      }
+    }
+  };
 
-  const renderPipelineArchitecture = () => (
+  const config = businessType && salesProcessConfig[businessType] ? salesProcessConfig[businessType] : null;
+
+  return (
     <div className="space-y-6">
-      <InfoBox>Design how you'll attract and nurture leads.</InfoBox>
-      <div className="grid grid-cols-2 gap-3">
-        {['Free Consultation', 'Ebook/Guide', 'Webinar'].map((m) => (
-          <label key={m} className="flex items-center space-x-2 p-4 border-2 rounded-lg">
-            <input type="checkbox" checked={(responses.leadMagnets || []).includes(m)} onChange={(e) => {
-              const c = responses.leadMagnets || [];
-              updateResponse('leadMagnets', e.target.checked ? [...c, m] : c.filter(x => x !== m));
-            }} />
-            <span>{m}</span>
+      <InfoBox>
+        Understanding your current sales process helps us identify opportunities for automation and improvement.
+      </InfoBox>
+
+      <div className="bg-white border-2 border-orange-200 rounded-xl p-6">
+        <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+          <span className="text-2xl mr-3">🛤️</span>
+          Your Customer Journey
+        </h3>
+        
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-2">Walk us through your sales process</label>
+            <textarea 
+              rows={6} 
+              placeholder="Step 1: Lead discovers us through...
+Step 2: They contact us by...
+Step 3: We respond with...
+Step 4: Then we...
+Step 5: Finally..." 
+              className="w-full p-4 border-2 border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-orange-500" 
+              value={responses.salesSteps || ''} 
+              onChange={(e) => updateResponse('salesSteps', e.target.value)} 
+            />
+            <p className="text-xs text-gray-500 mt-1">💡 Break down each step from first contact to closed deal</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+              <label className="block text-sm font-bold text-gray-700 mb-2">📊 How many touchpoints before they buy?</label>
+              <select 
+                className="w-full p-3 border-2 border-gray-300 rounded-lg text-lg" 
+                value={responses.touchpoints || ''} 
+                onChange={(e) => updateResponse('touchpoints', e.target.value)}
+              >
+                <option value="">Select...</option>
+                <option value="1-3">1-3 touchpoints</option>
+                <option value="4-6">4-6 touchpoints</option>
+                <option value="7-10">7-10 touchpoints</option>
+                <option value="11-15">11-15 touchpoints</option>
+              </select>
+            </div>
+
+            <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+              <label className="block text-sm font-bold text-gray-700 mb-2">⏱️ Average time to close?</label>
+              <select 
+                className="w-full p-3 border-2 border-gray-300 rounded-lg text-lg" 
+                value={responses.actualSalesCycle || ''} 
+                onChange={(e) => updateResponse('actualSalesCycle', e.target.value)}
+              >
+                <option value="">Select...</option>
+                <option value="same-day">Same day</option>
+                <option value="1-week">1 week</option>
+                <option value="2-4-weeks">2-4 weeks</option>
+                <option value="1-3-months">1-3 months</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {config && (
+        <div className="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-300 rounded-xl p-6">
+          <div className="flex items-center mb-4">
+            <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center mr-4 shadow-md">
+              <Target className="w-6 h-6 text-purple-600" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-gray-900">
+                {businessType.charAt(0).toUpperCase() + businessType.slice(1)}-Specific Sales Questions
+              </h3>
+              <p className="text-sm text-gray-600">Help us optimize your specific sales journey</p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">
+                Where do your leads typically come from?
+              </label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {config.leadSources.map((source) => (
+                  <label key={source} className="flex items-center space-x-2 p-3 bg-white border-2 border-gray-200 rounded-lg hover:bg-purple-50 hover:border-purple-300 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={(responses.leadSources || []).includes(source)}
+                      onChange={(e) => {
+                        const current = responses.leadSources || [];
+                        updateResponse(
+                          'leadSources',
+                          e.target.checked
+                            ? [...current, source]
+                            : current.filter(s => s !== source)
+                        );
+                      }}
+                      className="w-4 h-4 rounded"
+                    />
+                    <span className="text-sm font-medium">{source}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">
+                {config.specificQuestion.label}
+              </label>
+              <div className="grid md:grid-cols-2 gap-3">
+                {config.specificQuestion.options.map((option) => (
+                  <label key={option} className="flex items-center space-x-2 p-3 bg-white border-2 border-gray-200 rounded-lg hover:bg-purple-50 hover:border-purple-300 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={(responses.salesChallenges || []).includes(option)}
+                      onChange={(e) => {
+                        const current = responses.salesChallenges || [];
+                        updateResponse(
+                          'salesChallenges',
+                          e.target.checked
+                            ? [...current, option]
+                            : current.filter(c => c !== option)
+                        );
+                      }}
+                      className="w-4 h-4 rounded"
+                    />
+                    <span className="text-sm font-medium">{option}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">
+                Which metrics do you track (or want to track)?
+              </label>
+              <div className="grid md:grid-cols-2 gap-3">
+                {config.keyMetrics.map((metric) => (
+                  <label key={metric} className="flex items-center space-x-2 p-3 bg-white border-2 border-gray-200 rounded-lg hover:bg-purple-50 hover:border-purple-300 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={(responses.trackingMetrics || []).includes(metric)}
+                      onChange={(e) => {
+                        const current = responses.trackingMetrics || [];
+                        updateResponse(
+                          'trackingMetrics',
+                          e.target.checked
+                            ? [...current, metric]
+                            : current.filter(m => m !== metric)
+                        );
+                      }}
+                      className="w-4 h-4 rounded"
+                    />
+                    <span className="text-sm font-medium">{metric}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 p-4 bg-white rounded-lg border border-purple-200">
+            <p className="text-sm text-gray-600">
+              💡 <strong>Why we ask:</strong> These {businessType}-specific details help us recommend the right automation triggers and content that matches how your customers actually buy.
+            </p>
+          </div>
+        </div>
+      )}
+
+      <div className="bg-white border-2 border-red-200 rounded-xl p-6">
+        <h3 className="text-xl font-bold text-red-900 mb-4 flex items-center">
+          <span className="text-2xl mr-3">🚧</span>
+          Current Bottlenecks
+        </h3>
+        <div>
+          <label className="block text-sm font-bold text-gray-700 mb-2">
+            Where do you lose most prospects in your sales process?
           </label>
-        ))}
+          <textarea 
+            rows={3} 
+            placeholder="e.g., After initial consultation, during pricing discussion, when sending proposals..." 
+            className="w-full p-4 border-2 border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-red-500" 
+            value={responses.salesBottlenecks || ''} 
+            onChange={(e) => updateResponse('salesBottlenecks', e.target.value)} 
+          />
+          <p className="text-xs text-gray-500 mt-1">💡 Identifying bottlenecks helps us create targeted nurture sequences</p>
+        </div>
       </div>
     </div>
   );
+};
+
+  const renderPipelineArchitecture = () => {
+  const businessType = responses.businessType;
+
+  // Business-type specific pipeline configurations
+  const pipelineConfig = {
+    ecommerce: {
+      icon: ShoppingCart,
+      recommendedStages: [
+        { name: 'Website Visitor', description: 'Browsing products, not yet engaged' },
+        { name: 'Cart Added', description: 'Items in cart but not checked out' },
+        { name: 'Checkout Started', description: 'Began checkout process' },
+        { name: 'First Purchase', description: 'Completed first order' },
+        { name: 'Repeat Customer', description: 'Made 2+ purchases' }
+      ],
+      leadMagnets: [
+        { name: 'First purchase discount (10-15% off)', icon: '💰' },
+        { name: 'Free shipping on first order', icon: '🚚' },
+        { name: 'Product guide/lookbook', icon: '📖' },
+        { name: 'Exclusive early access to sales', icon: '⭐' },
+        { name: 'Loyalty program signup', icon: '🎁' }
+      ],
+      nurtureFocus: 'Cart recovery, product recommendations, loyalty building'
+    },
+    service: {
+      icon: Wrench,
+      recommendedStages: [
+        { name: 'New Inquiry', description: 'Initial contact made' },
+        { name: 'Consultation Scheduled', description: 'Booked discovery call/meeting' },
+        { name: 'Quote Provided', description: 'Sent pricing and proposal' },
+        { name: 'Booked', description: 'Service scheduled' },
+        { name: 'Completed', description: 'Service delivered' }
+      ],
+      leadMagnets: [
+        { name: 'Free consultation/assessment', icon: '💬' },
+        { name: 'Service guide or checklist', icon: '✅' },
+        { name: 'Before & after gallery', icon: '🖼️' },
+        { name: 'Educational video series', icon: '🎥' },
+        { name: 'First-time customer discount', icon: '🎟️' }
+      ],
+      nurtureFocus: 'Appointment reminders, service education, rebooking'
+    },
+    software: {
+      icon: Code,
+      recommendedStages: [
+        { name: 'Free Trial', description: 'Activated trial account' },
+        { name: 'Onboarding Started', description: 'Began setup process' },
+        { name: 'Active User', description: 'Regularly using key features' },
+        { name: 'Paid Customer', description: 'Converted to paid plan' },
+        { name: 'Power User', description: 'High engagement, expansion potential' }
+      ],
+      leadMagnets: [
+        { name: 'Free trial (7-14 days)', icon: '⚡' },
+        { name: 'Product demo/walkthrough', icon: '🎬' },
+        { name: 'Implementation guide', icon: '📘' },
+        { name: 'Template library', icon: '📋' },
+        { name: 'Webinar training series', icon: '🎓' }
+      ],
+      nurtureFocus: 'Feature adoption, trial extension, upgrade prompts'
+    },
+    consulting: {
+      icon: Briefcase,
+      recommendedStages: [
+        { name: 'New Lead', description: 'Initial inquiry received' },
+        { name: 'Discovery Call', description: 'Qualification call completed' },
+        { name: 'Proposal Sent', description: 'Custom proposal delivered' },
+        { name: 'Negotiation', description: 'Discussing terms and scope' },
+        { name: 'Client Onboarded', description: 'Contract signed, project started' }
+      ],
+      leadMagnets: [
+        { name: 'Free strategy session (30-60 min)', icon: '🎯' },
+        { name: 'Industry report or research', icon: '📊' },
+        { name: 'ROI calculator tool', icon: '🧮' },
+        { name: 'Case study collection', icon: '📑' },
+        { name: 'Implementation roadmap template', icon: '🗺️' }
+      ],
+      nurtureFocus: 'Authority building, proposal follow-up, scope clarification'
+    },
+    coaching: {
+      icon: TrendingUp,
+      recommendedStages: [
+        { name: 'New Lead', description: 'Entered your world' },
+        { name: 'Discovery Call Booked', description: 'Scheduled consultation' },
+        { name: 'Discovery Completed', description: 'Had initial conversation' },
+        { name: 'Enrolled', description: 'Joined program/coaching' },
+        { name: 'Active Client', description: 'Progressing through program' }
+      ],
+      leadMagnets: [
+        { name: 'Free discovery/breakthrough call', icon: '📞' },
+        { name: 'Self-assessment or quiz', icon: '📝' },
+        { name: 'Mini course or challenge', icon: '🎯' },
+        { name: 'Transformation story guide', icon: '✨' },
+        { name: 'Goal-setting workbook', icon: '📓' }
+      ],
+      nurtureFocus: 'Transformation stories, objection handling, commitment building'
+    },
+    agency: {
+      icon: Store,
+      recommendedStages: [
+        { name: 'Marketing Qualified Lead', description: 'Showed interest, fits ICP' },
+        { name: 'Sales Qualified', description: 'Budget and need confirmed' },
+        { name: 'Proposal Stage', description: 'Custom proposal submitted' },
+        { name: 'Negotiation', description: 'Finalizing scope and terms' },
+        { name: 'Client Active', description: 'Contract signed, onboarded' }
+      ],
+      leadMagnets: [
+        { name: 'Free marketing audit', icon: '🔍' },
+        { name: 'Strategy session', icon: '💡' },
+        { name: 'Industry benchmark report', icon: '📈' },
+        { name: 'Case study portfolio', icon: '🏆' },
+        { name: 'ROI projection tool', icon: '💰' }
+      ],
+      nurtureFocus: 'Expertise demonstration, competitive differentiation, results proof'
+    }
+  };
+
+  const config = businessType && pipelineConfig[businessType] ? pipelineConfig[businessType] : null;
+
+  return (
+    <div className="space-y-6">
+      <InfoBox>
+        Let's design how you'll attract and nurture leads through your marketing funnel based on your {businessType || 'business'} model.
+      </InfoBox>
+
+      {config && (
+        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 border-2 border-indigo-300 rounded-xl p-6">
+          <div className="flex items-center mb-4">
+            <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center mr-4 shadow-md">
+              <GitBranch className="w-6 h-6 text-indigo-600" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-gray-900">
+                Recommended Pipeline for {businessType.charAt(0).toUpperCase() + businessType.slice(1)}
+              </h3>
+              <p className="text-sm text-gray-600">Based on successful {businessType} businesses</p>
+            </div>
+          </div>
+
+          <div className="space-y-3 mb-6">
+            {config.recommendedStages.map((stage, index) => (
+              <div key={index} className="bg-white rounded-lg p-4 border-2 border-gray-200 hover:border-indigo-300 transition-colors">
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-bold text-sm mr-3">
+                    {index + 1}
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-bold text-gray-900">{stage.name}</div>
+                    <div className="text-sm text-gray-600">{stage.description}</div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      const current = responses.selectedPipelineStages || [];
+                      const isSelected = current.includes(stage.name);
+                      updateResponse(
+                        'selectedPipelineStages',
+                        isSelected 
+                          ? current.filter(s => s !== stage.name)
+                          : [...current, stage.name]
+                      );
+                    }}
+                    className={`px-4 py-2 rounded-lg font-bold text-sm transition-all ${
+                      (responses.selectedPipelineStages || []).includes(stage.name)
+                        ? 'bg-indigo-600 text-white'
+                        : 'bg-gray-100 text-gray-600 hover:bg-indigo-100'
+                    }`}
+                  >
+                    {(responses.selectedPipelineStages || []).includes(stage.name) ? '✓ Added' : '+ Add'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-white rounded-lg p-4 border border-indigo-200">
+            <p className="text-sm text-gray-600">
+              💡 <strong>Pro tip:</strong> {config.nurtureFocus}
+            </p>
+          </div>
+        </div>
+      )}
+
+      <div className="bg-white border-2 border-purple-200 rounded-xl p-6">
+        <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+          <span className="text-2xl mr-3">🎁</span>
+          Lead Magnets & Offers
+        </h3>
+        <p className="text-sm text-gray-600 mb-4">
+          {config 
+            ? `Select the lead magnets that work best for ${businessType} businesses:` 
+            : 'What will you offer to attract potential customers?'}
+        </p>
+
+        <div className="grid md:grid-cols-2 gap-3">
+          {config ? (
+            config.leadMagnets.map((magnet) => (
+              <label key={magnet.name} className="flex items-center space-x-3 p-4 bg-gray-50 border-2 border-gray-200 rounded-lg hover:bg-purple-50 hover:border-purple-300 cursor-pointer transition-all">
+                <input 
+                  type="checkbox" 
+                  checked={(responses.leadMagnets || []).includes(magnet.name)} 
+                  onChange={(e) => {
+                    const c = responses.leadMagnets || [];
+                    updateResponse('leadMagnets', e.target.checked ? [...c, magnet.name] : c.filter(x => x !== magnet.name));
+                  }} 
+                  className="w-5 h-5 rounded" 
+                />
+                <span className="text-2xl">{magnet.icon}</span>
+                <span className="text-sm font-medium flex-1">{magnet.name}</span>
+              </label>
+            ))
+          ) : (
+            <>
+              <label className="flex items-center space-x-3 p-4 bg-gray-50 border-2 border-gray-200 rounded-lg hover:bg-purple-50 hover:border-purple-300 cursor-pointer transition-all">
+                <input type="checkbox" className="w-5 h-5 rounded" />
+                <span className="text-2xl">💬</span>
+                <span className="text-sm font-medium">Free Consultation</span>
+              </label>
+              <label className="flex items-center space-x-3 p-4 bg-gray-50 border-2 border-gray-200 rounded-lg hover:bg-purple-50 hover:border-purple-300 cursor-pointer transition-all">
+                <input type="checkbox" className="w-5 h-5 rounded" />
+                <span className="text-2xl">📘</span>
+                <span className="text-sm font-medium">Ebook/Guide Download</span>
+              </label>
+            </>
+          )}
+        </div>
+      </div>
+
+      <div className="bg-white border-2 border-blue-200 rounded-xl p-6">
+        <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+          <span className="text-2xl mr-3">📧</span>
+          Email Nurture Strategy
+        </h3>
+        
+        <div className="grid md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-2">How many emails in your sequence?</label>
+            <select 
+              className="w-full p-4 border-2 border-gray-300 rounded-lg text-lg" 
+              value={responses.emailSequenceLength || ''} 
+              onChange={(e) => updateResponse('emailSequenceLength', e.target.value)}
+            >
+              <option value="">Choose...</option>
+              <option value="3-5">3-5 emails (Quick)</option>
+              <option value="6-8">6-8 emails (Balanced)</option>
+              <option value="9-12">9-12 emails (Extended)</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-2">How often should we send?</label>
+            <select 
+              className="w-full p-4 border-2 border-gray-300 rounded-lg text-lg" 
+              value={responses.emailFrequency || ''} 
+              onChange={(e) => updateResponse('emailFrequency', e.target.value)}
+            >
+              <option value="">Choose...</option>
+              <option value="daily">Every day</option>
+              <option value="every-other">Every other day</option>
+              <option value="twice-weekly">Twice per week</option>
+              <option value="weekly">Once per week</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white border-2 border-green-200 rounded-xl p-6">
+        <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+          <span className="text-2xl mr-3">🎯</span>
+          Custom Pipeline Notes
+        </h3>
+        <div>
+          <label className="block text-sm font-bold text-gray-700 mb-2">
+            Any specific stages or processes unique to your business?
+          </label>
+          <textarea 
+            rows={4} 
+            placeholder="Describe any custom stages, qualifications, or processes we should include..." 
+            className="w-full p-4 border-2 border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-green-500" 
+            value={responses.customPipelineNotes || ''} 
+            onChange={(e) => updateResponse('customPipelineNotes', e.target.value)} 
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
 
   const renderAutomationMapping = () => (
     <div className="space-y-6">
